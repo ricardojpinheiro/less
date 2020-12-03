@@ -70,12 +70,12 @@ begin
         nAvailableSegments := Mapper.nFreePriMapperSegs;
         nUsedSegments := 0;
         fillchar(aAllocatedSegments, sizeof(aAllocatedSegments), 0);
-        while (AllRight) or (i < HowManySegments) do
+        while (AllRight) and (i <= HowManySegments) do
         begin
             AllRight := AllocMapperSegment(Mapper, Mapper.nPriMapperSlot, UserSegment, aAllocatedSegments[i]);
             i := i + 1;
 {
-           writeln('Allocated Segment ', i - 1, ': ', aAllocatedSegments[i - 1]);
+           writeln('Allocated Segment ', i - 1, ': ', aAllocatedSegments[i - 1], ' AllRight: ', AllRight);
 }            
         end;
         nAllocatedSegments := HowManySegments;

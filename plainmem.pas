@@ -25,7 +25,7 @@
 {$i d:maprrw.inc}
 {$i d:maprallc.inc}
 {$i d:maprpage.inc}
-{$i diversos.inc} 
+{$i divs.inc}
  
 (*
 * Constants
@@ -49,7 +49,7 @@ type
             nAllocatedSegments  : Byte;   { How many segments are allocated    }
             aAllocatedSegments  : array [1..MaxSegments] of Byte;
     end;
-    aBuffer =   array[1..LastPositionSegment] of byte absolute $8000;   { Page 2 }
+    aBuffer =   array[1..LastPositionSegment] of byte;
 
 (*
 * Enable the plain memory abstraction layer.
@@ -257,7 +257,7 @@ begin
     writeln('Total segments of primary mapper: ', Mapper.nTotalMapperSegs);
 
     writeln('Enabling Plain Memory...');
-    EnablePlainMem (PlainMemory, Mapper, 1);
+    EnablePlainMem (PlainMemory, Mapper, 2);
 
     fillchar(Texto, sizeof(Texto), ' ' );
 

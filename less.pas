@@ -1,22 +1,23 @@
 {
-   lessdemo.pas
+   less.pas
 }
 
-program lessdemo;
+program less;
 
 {$i d:types.inc}
-{$i d:dos.inc}
-{$i d:dos2err.inc}
-{$i d:dos2file.inc}
-{$i d:fastwrit.inc}
 {$i d:msxbios.inc}
 {$i d:extbio.inc}
 {$i d:maprbase.inc}
 {$i d:maprvars.inc}
 {$i d:maprrw.inc}
 {$i d:maprallc.inc}
+{$i d:maprpage.inc}
+{$i d:dos.inc}
+{$i d:dos2err.inc}
+{$i d:dos2file.inc}
+{$i d:fastwrit.inc}
 {$i d:blink.inc}
-{$i d:divs.inc} 
+{$i d:divs.inc}
 {$i d:plainmem.inc}
 
 const
@@ -78,21 +79,14 @@ var i, j, k, l, Page, MaxBlock: integer;
     Mapper: TMapperHandle;
     PointerMapperVarTable: PMapperVarTable;
     NextPage, SeekResult, CloseResult: boolean;
-    BlockReadResult, Position: byte;
+    BlockReadResult: byte;
     NewPosition: integer;
     TextFileName: TFileName;
-    ScreenBuffer: array[0..SizeScreen] of char;
-    EndOfPage: array[0..PagesPerSegment] of integer absolute $BFD0; { Page 2 }
-    PageRemnant: integer;
-    OriginalRegister9Value: byte;
     ch, sch: char;
 
     TempString: TString;
     TempTinyString: string[5];
     MaxTotalPagesPerSegment, LastSegment, Segment, TotalPages: integer;
-    VDPSAV1: array[0..7]  of byte absolute $F3DF;
-    VDPSAV2: array[8..23] of byte absolute $FFE7;
-    TXTNAM : integer absolute $F3B3;
 
 procedure ErrorCode (ExitOrNot: boolean);
 var
@@ -105,12 +99,6 @@ begin
     WriteLn (ErrorMessage);
     if ExitOrNot = true then
         Exit;
-end;
-
-Procedure FillVRAM (VRAMaddress: Integer; NumberOfBytes: Integer;Value: Byte);
-begin
-    inline ($DD/$21/$6B/$01/
-            $ED/$4B/NumberOfBytes/$2A/VRAMaddress/$3A/Value/$C3/_CALROM);
 end;
 
 Procedure GotoXY2( nPosX, nPosY : Byte );
@@ -133,112 +121,6 @@ begin
             /$CD/$1c/00/$32/bt/$fb);
      readkey := chr(bt);
      qqc := 0;
-end;
-
-function PreProcessing (Segment: Byte): byte;
-var 
-    EndOfPageIndex, BufferIndex, ScreenBufferIndex, temporary: integer;
-    NextSegment: boolean;
-begin
-    
-{ A função dessa rotina de pre-processamento é localizar onde começa e onde
-  termina cada página, dentro do segmento de memoria acessado. A ideia é
-  salvar no vetor EndOfPage (q está travado na posição $BFD0 (página 2),
-  então em cada segmento da Mapper, teremos o bloco de texto + o vetor
-  EndOfPage daquele bloco, pra n ter q refazer o pré-processamento de tudo.
-  O problema é o texto "quebrado", em que parte começa em uma página e termina
-  em outra. Aí o vetor EndOfPage tem que ter a informação da página seguinte 
-  também.
-  }
-
-{ Inicializa variáveis e seta o segmento da Mapper na página 2 }
-
-    EndOfPage[0]    := 0;
-    EndOfPageIndex  := 0;
-    BufferIndex     := 0;
-    NextSegment     := false;
-{    
-    writeln('EndOfPage[',EndOfPageIndex,']=',EndOfPage[EndOfPageIndex]);
-}
-{ Repete até que o EndofPage[EndOfPageIndex - 1] seja maior do que o EndOfPage[EndOfPageIndex] }
-
-    repeat
-        EndOfPageIndex := EndOfPageIndex + 1;
-        ScreenBufferIndex := 0;
-        temporary := EndOfPage[EndOfPageIndex - 1];
-
-        while (ScreenBufferIndex < SizeTextScreen) do
-        begin
-            if BufferIndex >= Limit then
-            begin
-
-{ Se o i for maior do que Limit, significa que o texto está quebrado.
-  Logo, é preciso pegar o resto na página seguinte. A flag NextSegment
-  marca a necessidade de pegar o dado no segmento seguinte. } 
-
-                BufferIndex := 0;
-                NextSegment := true;
-            end;
-            
-            case Buffer[BufferIndex] of
-                9:              ScreenBufferIndex := ScreenBufferIndex + 8;
-                13:             ScreenBufferIndex := (((ScreenBufferIndex div 80) + 1) * 80) - 2;
-                else            ScreenBufferIndex := ScreenBufferIndex + 1;
-            end;
-            BufferIndex := BufferIndex + 1;
-        end;
-        EndOfPage[EndOfPageIndex] := BufferIndex - 1;
-{
-       writeln('EndOfPage[',EndOfPageIndex - 1,']=',temporary, ' EndOfPage[',EndOfPageIndex,']=',EndOfPage[EndOfPageIndex]);
-}
-    until (EndOfPage[EndOfPageIndex] < temporary);
-    
-    EndOfPage[EndOfPageIndex] := Limit;
-{
-     if NextSegment then
-        PageRemnant := EndOfPage[EndOfPageIndex];
-}
-    PreProcessing := EndOfPageIndex;
-end;
-
-procedure FromRAMToVRAM (Segment: integer; Page, MaxTotalPagesPerSegment: byte);
-var 
-    i, j, temporary: integer;
-    
-begin
-    
-{ Aqui, joga da RAM pra VRAM. }
-
-    i := EndOfPage[Page - 1];
-
-    if Page > 1 then
-        i := i - 2;
-    k := 0;
-
-    fillchar(ScreenBuffer, sizeof(ScreenBuffer), ' ');
-    temporary := EndOfPage[Page];
-    if Page = MaxTotalPagesPerSegment - 1 then
-        temporary := Limit;
-
-    while (k < SizeTextScreen) and (i < temporary) do
-    begin
-        if i >= Limit then
-        begin
-            i := 0;
-            temporary := EndOfPage[Page + 1];
-        end;
-        if Buffer[i] in Print then
-            ScreenBuffer[k] := chr(Buffer[i])
-        else
-            case Buffer[i] of
-                9:              k := k + 8;
-                13:             k := (((k div 80) + 1) * 80) - 2;
-                10, 127, 255:   k := k + 0;
-            end;
-        i := i + 1;
-        k := k + 1;
-    end;
-    WriteVRAM (0, $0000, addr(ScreenBuffer), $0730);
 end;
 
 procedure SetLastLine (TextFileName: TFileName; PagePerDocument, TotalPages, Line: integer);
@@ -273,8 +155,6 @@ BEGIN
     writeln('Reading services file...');
     TextFileName := 'd:\services';
 
-    
-
 { Le arquivo 1a vez - pega o tamanho de tudo. }
 
     assign(B2FileHandle, TextFileName);
@@ -294,12 +174,11 @@ BEGIN
 
 { Comeca com o segmento 4 da memoria. }
 
-    PageRemnant := 0;
     i := FirstSegment;
     MaxBlock := round(int(MaxSize / Limit)) + 1;
     writeln ('MaxBlock: ', MaxBlock);
 
-    EnablePlainMem (PlainMemory, Mapper, 48);
+    EnablePlainMem (PlainMemory, Mapper, MaxBlock);
     
     writeln('Plain Memory enabled.');
     
@@ -317,7 +196,7 @@ BEGIN
     CloseResult := FileClose(BFileHandle);
 
     exit;
-
+(*
 { Aqui, ele mostra a pagina. Se teclar ESC, sai do programa. }
 
     ch := #00;
@@ -409,4 +288,6 @@ BEGIN
         end;
     end;
     ClearAllBlinks;
+*)
+
 END.
