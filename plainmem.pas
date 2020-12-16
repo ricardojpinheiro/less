@@ -25,8 +25,8 @@
 {$i d:maprrw.inc}
 {$i d:maprallc.inc}
 {$i d:maprpage.inc}
-{$i divs.inc}
- 
+{$i d:divs.inc} 
+
 (*
 * Constants
 *)
@@ -68,12 +68,12 @@ begin
         nAvailableSegments := Mapper.nFreePriMapperSegs;
         nUsedSegments := 0;
         fillchar(aAllocatedSegments, sizeof(aAllocatedSegments), 0);
-        while (AllRight) or (i < HowManySegments) do
+        while (AllRight) and (i <= HowManySegments) do
         begin
             AllRight := AllocMapperSegment(Mapper, Mapper.nPriMapperSlot, UserSegment, aAllocatedSegments[i]);
             i := i + 1;
 {
-           writeln('Allocated Segment ', i - 1, ': ', aAllocatedSegments[i - 1]);
+           writeln('Allocated Segment ', i - 1, ': ', aAllocatedSegments[i - 1], ' AllRight: ', AllRight);
 }            
         end;
         nAllocatedSegments := HowManySegments;
@@ -167,6 +167,22 @@ begin
 end;
 
 (*
+*  Read a byte from the memory mapper.
+*)
+function ReadByteFromPlainMemory (handle: TMapperHandle; PlainMemData : TPlainMem;
+                        Position: real): Byte;
+var
+    SegmentToBeUsed: byte;
+    AddressInSegment: integer;
+
+begin
+    SegmentToBeUsed  := IntegerDivision(Position, LastPositionAtSegment) + 1;
+    AddressInSegment := IntegerRemainder(Position, LastPositionAtSegment);
+    ReadByteFromPlainMemory := ReadMapperSegment(handle,
+                PlainMemData.aAllocatedSegments[SegmentToBeUsed], AddressInSegment);
+end;
+
+(*
 *   Write a bunch of bytes into the memory mapper.
 *)
 procedure WriteToPlainMemory (handle: TMapperHandle; var PlainMemData : TPlainMem; 
@@ -236,6 +252,23 @@ begin
 }
 end;
 
+(*
+*  Write a byte to the memory mapper.
+*)
+function WriteByteToPlainMemory (handle: TMapperHandle; var PlainMemData : TPlainMem; 
+                            Position: real; Data: Byte): boolean;
+var
+    SegmentToBeUsed: byte;
+    AddressInSegment: integer;
+
+begin
+    SegmentToBeUsed  := IntegerDivision(Position, LastPositionAtSegment) + 1;
+    AddressInSegment := IntegerRemainder(Position, LastPositionAtSegment);
+    WriteByteToPlainMemory := WriteMapperSegment(handle, 
+                PlainMemData.aAllocatedSegments[SegmentToBeUsed], AddressInSegment, Data);
+end;
+
+
 var
     Mapper: TMapperHandle;
     PointerMapperVarTable: PMapperVarTable;
@@ -258,7 +291,8 @@ begin
 
     writeln('Enabling Plain Memory...');
     EnablePlainMem (PlainMemory, Mapper, 2);
-
+    
+    Writeln('Using Read and Write To Plain Memory');
     fillchar(Texto, sizeof(Texto), ' ' );
 
     Texto := 'MSX r0x a lot, dudez.';
@@ -283,6 +317,18 @@ begin
     ReadFromPlainMemory (Mapper, PlainMemory, 16380, 16380 + j, Buffer);
     for i := 1 to j do
         Texto[i] := chr(Buffer[i]);
+    Texto[0] := chr(j);
+    writeln('Text: ', Texto);
+    
+    Writeln('Using Read and Write Bytes To and From Plain Memory');
+    writeln('Writing to...');
+    for i := 1 to j do
+        Teste := WriteByteToPlainMemory(Mapper, PlainMemory, 16380 + i, ord(Texto[i]));
+    fillchar(Texto, sizeof(Texto), ' ' );
+    writeln('Text: ', Texto);
+    writeln('Reading from...');
+    for i := 1 to j do
+        Texto[i] := chr(ReadByteFromPlainMemory (Mapper, PlainMemory, 16380 + i));
     Texto[0] := chr(j);
     writeln('Text: ', Texto);
     writeln('Disabling...');
