@@ -1,0 +1,25 @@
+Funciona - e, j, Control-E, Control-J, ENTER, seta pra baixo - avança uma linha.
+Funciona - d, y, Control-D, Control-Y, Control-P, seta pra cima  - retrocede uma linha.
+Funciona - f, Control-F, Control-V ou espaço - avança uma tela.
+Funciona - b, Control-B - retrocede uma tela.
+Funciona - g, INSERT, SELECT + INSERT - Início do arquivo.
+Funciona - i, DELETE, SELECT + DELETE - Fim do arquivo.
+Funciona - /<padrão> - busca o padrão pra frente.
+Funciona - ?<padrão> - busca o padrão pra trás.
+Funciona - n - Procura a próxima ocorrência do padrão.
+Funciona - m - Procura a ocorrência anterior do padrão.
+Funciona - p - Redesenha a tela.
+Funciona - v - Exibe a versão do programa.
+Funciona - q - sai.
+
+&<padrão> - Exibe apenas as linhas que tem aquele padrão.
+SELECT + U - Apaga as palavras destacadas.
+s - Executa o editor de texto (definido na variável EDITOR) para abrir este arquivo.
+
+/h - mostra o help.
+/v - versão.
+/D - Define cores.
+/m e /M - prompt muda.
+/N - numera as linhas.
+(* /s - encolhe linhas em branco *)
+
