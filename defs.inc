@@ -17,58 +17,58 @@ Const
     
     (*	Related to MSX blink table. *)
     
-    Vdp14     						= 13;		{ Blink rate register in vdp}
-    Vdp13     						= 12;		{ Blink colors High nibble = foreground	}
-	SetB 							= True;
-    ResB 							= False;	{ Switch values for setbit }
+    Vdp14     				= 13;		{ Blink rate register in vdp}
+    Vdp13     				= 12;		{ Blink colors High nibble = foreground	}
+	SetB 					= True;
+    ResB					= False;	{ Switch values for setbit }
     MaskTable: 	Array[0..7] Of Byte = (128,64,32,16,8,4,2,1);
 
 	(*	Used in less - keystrokes. *)
 
-    CONTROLA						= 1;
-    CONTROLB    					= 2;
-    CONTROLC    					= 3;
-    CONTROLD    					= 4;
-    CONTROLE    					= 5;
-    CONTROLF    					= 6;
-    CONTROLG    					= 7;
-    CONTROLJ    					= 10;
-    CONTROLN    					= 14;
-    CONTROLO    					= 15;
-    CONTROLP    					= 16;
-    CONTROLQ    					= 17;
-    CONTROLS    					= 19;
-    CONTROLT    					= 20;
-    CONTROLV    					= 22;
-    CONTROLW    					= 23;
-    CONTROLY    					= 25;
-    CONTROLZ    					= 26;
-    BS          					= 8;
-    TAB         					= 9;
-    HOME        					= 11;
-    CLS         					= 12;
-    ENTER       					= 13;
-    INSERT      					= 18;
-    SELECT      					= 24;
-    ESC         					= 27;
-    RightArrow  					= 28;
-    LeftArrow   					= 29;
-    UpArrow     					= 30;
-    DownArrow   					= 31;
-    SPACE       					= 32;
-    DELETE      					= 127;
+    CONTROLA				= 1;
+    CONTROLB    			= 2;
+    CONTROLC  				= 3;
+    CONTROLD    			= 4;
+    CONTROLE    			= 5;
+    CONTROLF    			= 6;
+    CONTROLG    			= 7;
+    CONTROLJ    			= 10;
+    CONTROLN   				= 14;
+    CONTROLO    			= 15;
+    CONTROLP    			= 16;
+    CONTROLQ   				= 17;
+    CONTROLS    			= 19;
+    CONTROLT    			= 20;
+    CONTROLV   				= 22;
+    CONTROLW    			= 23;
+    CONTROLY    			= 25;
+    CONTROLZ   				= 26;
+    BS          			= 8;
+    TAB         			= 9;
+    HOME       				= 11;
+    CLS         			= 12;
+    ENTER       			= 13;
+    INSERT     				= 18;
+    SELECT      			= 24;
+    ESC         			= 27;
+    RightArrow 				= 28;
+    LeftArrow   			= 29;
+    UpArrow     			= 30;
+    DownArrow  				= 31;
+    SPACE       			= 32;
+    DELETE      			= 127;
 
 	(*	Used in less - limits. *)
 
-    maxlines						= 1568;
-    maxcols     					= 255;
-    maxwidth    					= 78;
-    maxlength   					= 22;
+    maxlines				= 1568;
+    maxcols     			= 255;
+    maxwidth    			= 78;
+    maxlength  				= 22;
 
 	(*	Used in less - VRAM limits. *)
 
-    startvram       				= 5120;
-    limitvram       				= 65280;
+    startvram       		= 5120;
+    limitvram       		= 65280;
 
 Type
 	Pointer     = ^Byte;                   { Pointer generic type }
@@ -184,6 +184,6 @@ Var
 	destline, destcolumn: 				integer;
     
     
-    ScreenStatus:						TScreenStatus;
+    ScreenStatus, NewScreenStatus:		TScreenStatus;
     EditWindowPtr:						Pointer;
     MSXDOSversion:						TMSXDOSVersion;

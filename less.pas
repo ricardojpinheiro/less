@@ -31,7 +31,7 @@ begin
     GotoXY(((maxwidth - length(filename)) div 2), 1);
     temp := concat('[', filename, ']');
     
-    FastWriteln(temp);
+    FastWrite(temp);
     
     DrawScreen(currentline, screenline, 1);
 end;
@@ -71,11 +71,11 @@ begin
     close(textfile);
 
     highestline := currentline - 1;		insertmode  := true;
-    currentline := 1;	column := 1;	screenline  := currentline;
+    currentline := 1;	column := 1;	screenline  := 1;
 
     DrawScreen(currentline, screenline, 1);
     ClearStatusLine;
-    Blink(2, 1, maxwidth);
+    Blink(2, screenline + 1, maxwidth);
 end;
 
 procedure ExitToDOS;
@@ -103,14 +103,14 @@ begin
         TRZ80mode;
 
 	ClearAllBlinks;
+	with ScreenStatus do
+		Color(nFgColor, nBkColor, nBdrColor);
     ClrScr;
     Halt;
 end;
 
 procedure InitTextEditor;
 begin
-    GetScreenStatus(ScreenStatus);
-    
     if ScreenStatus.bFnKeyOn then
         SetFnKeyStatus (false);
     
@@ -119,7 +119,7 @@ begin
     
 (*	Opção de alterar a cor da tela deve ser colocada. *)    
     
-    SetBlinkColors(ScreenStatus.nBkColor, ScreenStatus.nFgColor);
+    SetBlinkColors(NewScreenStatus.nBkColor, NewScreenStatus.nFgColor);
     SetBlinkRate(5, 0);
 
 (*  Some variables. *)   
@@ -204,6 +204,8 @@ begin
     Print       := AllChars - NoPrint;
 
     GetMSXDOSVersion (MSXDOSversion);
+	GetScreenStatus (ScreenStatus);
+	NewScreenStatus := ScreenStatus;
 
     if paramcount = 0 then
     exit
@@ -220,11 +222,22 @@ begin
 				if temp[1] = '/' then
 				begin
 					delete(temp, 1, 2);
-	(*  Parameters. *)
+(*  Parameters. *)
 					case c of
 						'V': CommandLine(1);
 						'H': CommandLine(2);
-						'D': delay(10); { Define cores } 
+						'D': begin	{ Define cores }
+								with NewScreenStatus do
+								begin
+									val(copy(temp, 1, (pos(chr(44), temp)) - 1), 
+										aux, rtcode);
+									nFgColor := aux;
+									val(copy(temp, pos(chr(44), temp) + 1, 
+										length(temp)), aux, rtcode);
+									nBkColor := aux;
+									Color(nFgColor, nBkColor, nBkColor);
+								end;  
+							end;
 						'M': delay(10); { Muda o prompt } 
 						'N': delay(10); { Numera as linhas } 
 					end;

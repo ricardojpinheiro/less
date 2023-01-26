@@ -40,7 +40,7 @@ Begin
 		Ram 	:= Ram 	+ Width;
 	End;
 
-	FillChar(line, 81, chr(32)); {Fill with horizontal line }
+	FillChar(line, 81, Horizontal); {Fill with horizontal line }
 
 	a := (Width - Length(Header)) Div 2;
 	For b:= 1 To Length(Header) Do
@@ -97,7 +97,7 @@ Begin
 
 	For i := 1 to Mem[at+3]-3 Do
 	Begin
-		ReadVram(0,vram+80,Ram,Byt);
+		ReadVram(0,Vram+80,Ram,Byt);
         WriteVram(0,Vram,Ram,Byt);
         Vram := Vram + 80;
 	End;

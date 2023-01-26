@@ -71,6 +71,32 @@ Begin
     CALSLT (regs);
 End;
 
+(**
+  * Change the screen color (Foreground, background and Border);
+  * @param nFgColor The foreground color to change;
+  * @param nBkColor The backgound color to change;
+  * @param nBdrColor The border color to change;
+  *)
+Procedure Color( nFgColor, nBkColor, nBdrColor : Byte );
+Const
+        ctCHGCLR  = $0062;    { Changes the color of the screen }
+
+Var
+        regs    : TRegs;
+        EXPTBL  : Byte Absolute $FCC1; { Slot 0 }
+        FORCLR  : Byte Absolute $F3E9; { Foreground color  }
+        BAKCLR  : Byte Absolute $F3EA; { Background color  }
+        BDRCLR  : Byte Absolute $F3EB; { Border color      }
+
+Begin
+  FORCLR  := nFgColor ;
+  BAKCLR  := nBkColor;
+  BDRCLR  := nBdrColor ;
+  regs.IX := ctCHGCLR;
+  regs.IY := EXPTBL;
+  CALSLT( regs );
+End;
+
 Procedure GetScreenStatus( Var scrStatus : TScreenStatus );
 Begin
     With scrStatus Do
@@ -86,6 +112,49 @@ Begin
         Else
             TextMode := TextMode32;
     End;
+End;
+
+(**
+  * Set the new text mode;
+  * @param mode The new @see TTextMode to set;
+  *)
+Procedure SetTextMode( mode : TTextMode );
+Const
+        ctINITXT  = $006C;    { Initialize screen for text mode (40x24) }
+        ctINIT32  = $006F;    { Initialize screen mode for text (32x24) }
+
+Var
+        regs    : TRegs;
+        EXPTBL  : Byte Absolute $FCC1; { Slot 0 }
+
+Begin
+  If( mode = TextMode4080 )  Then
+    regs.IX := ctINITXT
+  Else
+    regs.IX := ctINIT32;
+
+  regs.IY := EXPTBL;
+  CALSLT( regs );
+End;
+
+(**
+  * Set the new screen status, retrieving the old screen
+  * status;
+  * @param scrStatus The new @see TScreenStatus with the new
+  * screen colors and dimension;
+  * @param scrRet The old @see TScreenStatus;
+  *)
+Procedure SetScreenStatus( scrStatus  : TScreenStatus;
+                           Var scrRet : TScreenStatus );
+Begin
+  GetScreenStatus( scrRet );
+
+  ScreenWidth( scrStatus.nWidth );
+  SetFnKeyStatus( scrStatus.bFnKeyOn );
+  SetTextMode( scrStatus.TextMode );
+  Color( scrStatus.nFgColor,
+         scrStatus.nBkColor,
+         scrStatus.nBdrColor );
 End;
 
 function msx_version: byte;

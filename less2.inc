@@ -41,7 +41,6 @@ begin
                 writeln;
                 FastWriteln('Parameters: ');
 				FastWriteln('/d<fg>,<bg>    - Define foreground and background colors.');
-                FastWriteln('/m             - Set prompt style.');
                 FastWriteln('/n             - Use line numbers.');
                 FastWriteln('/h             - Show this help text and exit.');
                 FastWriteln('/v             - Output version information and exit.');
