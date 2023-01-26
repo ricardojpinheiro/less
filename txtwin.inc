@@ -13,58 +13,59 @@ Function MakeWindow (Col, Row, Width, Height: Byte; Header: TString):  Pointer;
                                          .
 }
 Const
-    ULC 		= #24;
-    URC 		= #25; {UpperLefCorner ..Charnumbers for the Frame}
-    DLC 		= #26;
-    DRC 		= #27;
-    VERTICAL 	= #22;
-    HORIZONTAL 	= #23;
+    ULC = #24;
+    URC = #25; {UpperLefCorner ..Charnumbers for the Frame}
+    DLC = #26;
+    DRC = #27;
+    VERTICAL = #22;
+    HORIZONTAL = #23;
 
 Var 
     a, b:		Byte;
 
 Begin
-    GetMem(pt, Width * Height + 6);
-    Mem[at]     := Col;
-    Mem[at+1]   := Row;
-    Mem[at+2]   := Width;
-    Mem[at+3]   := Height;
-    Mem[at+4]   := 1;
-    Mem[at+5]   := 1;
-    Vram    	:= (Row - 1) * 80 + Col;
-    Ram     	:= At + 6;
-    For Count := 1 to Height Do
-    Begin
-        ReadVram(0, Vram, Ram, Width);
-        Vram    := Vram     + 80;
-        Ram     := Ram      + Width;
-    End;
-    FillChar(Line1, 81, Horizontal); {Fill with horizontal line }
-    
-    a := (Width - Length(Header)) Div 2;
-    For b := 1 To Length(Header) Do
-        Line1[a + b] := Header[b];
-    Line1[1]       := ULC;
-    Line1[Width]   := URC;
-    Vram := (Row - 1) * 80 + Col;
-    WriteVram(0, Vram, Addr(Line1[1]), Width);
+	GetMem(pt, Width * Height + 6);
+	Mem[at] 	:= 	Col;
+	Mem[at+1] 	:= 	Row;
+	Mem[at+2] 	:= 	Width;
+	Mem[at+3] 	:=	Height;
+	Mem[at+4] 	:= 	1;
+	Mem[at+5] 	:= 	1;
+	Vram := (Row - 1) * 80 + Col;
+	Ram := At+6;
+	For Count := 1 to Height Do
+	Begin
+		ReadVram(0, Vram, Ram, Width);
+		Vram 	:= Vram + 80;
+		Ram 	:= Ram 	+ Width;
+	End;
 
-    FillChar(Line1, 81, 32); {Fill with space }
-    Line1[1]       := VERTICAL;
-    Line1[Width]   := VERTICAL;
-    Vram        := Vram + 80;
-    For Count := 2 to height - 1 Do
-    Begin
-        WriteVram(0, Vram, Addr(Line1[1]), Width);
-        Vram := Vram + 80;
-    End;
+	FillChar(line, 81, chr(32)); {Fill with horizontal line }
 
-    FillChar(Line1, 81, Horizontal); {Fill with horizontal line }
-    Line1[1]       := DLC;
-    Line1[Width]   := DRC;
-    WriteVram(0, Vram, Addr(Line1[1]), Width);
+	a := (Width - Length(Header)) Div 2;
+	For b:= 1 To Length(Header) Do
+		line[a+b] := Header[b];
+	line[1] 	:= ULC;
+	line[Width] := URC;
+	Vram 		:= (Row - 1) * 80 + Col;
+	WriteVram(0, Vram, Addr(line[1]), Width);
 
-    MakeWindow := pt;
+	FillChar(line, 81, 32); {Fill with space }
+	line[1] 	:= Vertical;
+	line[Width] := Vertical;
+	Vram 		:= Vram + 80;
+	For Count 	:= 2 to height-1 Do
+	Begin
+		WriteVram(0, Vram, Addr(line[1]), Width);
+		Vram 	:= Vram + 80;
+	End;
+
+	FillChar(line, 81, Horizontal); {Fill with horizontal line }
+	line[1] 	:= DLC;
+	line[Width] := DRC;
+	WriteVram(0, Vram, Addr(line[1]), Width);
+
+	MakeWindow := pt;
 End;  {MakeWindow}
 
 Procedure EraseWindow(WindowPtr: Pointer);
@@ -205,7 +206,8 @@ Var
 	pt:					Integer;
 	at:					WindowInfoType;
 	WrtLen, LinLen, 
-	Bottom, StIndex:	Byte;
+	Bottom, StIndex, b:	Byte;
+	temp:				String[8];
 
 	Procedure FillRow(Var StringIndex:Byte);
 	Begin
@@ -260,6 +262,21 @@ Var
 
 
 Begin
+	FillChar(temp, sizeof(temp), chr(32));
+	
+	for b := 1 to 8 do
+		temp := temp + chr(32);
+
+	b := pos(chr(9), St);
+
+	while b <> 0 do
+	begin
+		delete(St, b, 1);
+		delete(St, sizeof(St) - length(temp), length(temp));
+		insert(temp, St, b);
+		b := pos(chr(9), St);
+	end;
+
 	pt := Addr(at);
     Inline($f3/$01/6/0/ $2a/WindowPtr/ $ed/$5b/ pt/$ed/$b0 );
     With at Do
