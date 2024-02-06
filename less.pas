@@ -1,7 +1,7 @@
 (* less.pas - This wannabe GNU less-like text pager is based on milli, my
  * text editor (https://ricardojpinheiro.github.io/nanomsx/). 
  * Our main approach is to have all useful less funcionalities. 
- * MSX version by Ricardo Jurczyk Pinheiro - 2022.  *)
+ * MSX version by Ricardo Jurczyk Pinheiro - 2022-2024.  *)
 
 program less;
 
@@ -32,48 +32,69 @@ begin
     temp := concat('[', filename, ']');
     
     FastWrite(temp);
-    
-    DrawScreen(currentline, screenline, 1);
 end;
 
 procedure ReadFile;
 var
-    VRAMAddress:        integer;
-
+    VRAMAddress, l:        		integer;
+	lengthline, lineparts:		byte;
+	
 begin
 	counter := startvram;
-	
+
 	temp	:= concat ('Reading file ', filename);
 	StatusLine(temp);
-	
+    
     assign(textfile, filename);
     {$i-}
     reset(textfile);
     {$i+}
 	currentline := 1;
-
+	
 	while not eof(textfile) and (currentline <= maxlines) do
 	begin
 		FillChar(line, sizeof(line), chr(32));
 		readln(textfile, line);
-		
+		lengthline := length(line);
+
 		InitVRAM(currentline, counter);
-		counter := counter + maxcols;
+		counter := counter + maxwidth;
+
 		if currentline = 783 then
 			fillvram(1, 0, 0, $FFFF);
-		
-		FromRAMToVRAM(line, currentline);
-		emptylines[currentline] := false;
+
+		if lengthline <= maxwidth then
+			FromRAMToVRAM(line, currentline)
+		else
+		begin
+			l := 1;
+			lineparts := lengthline div maxwidth;
+			for i := 1 to lineparts + 1 do
+			begin
+				FillChar(Line1, sizeof(Line1), chr(32));
+				Line1 := copy (line, l, l + (maxwidth - 1));
+				l := l + maxwidth;
+				currentline := currentline + 1;
+
+				if i >= 1 then
+				begin
+					InitVRAM(currentline, counter);
+					counter := counter + maxcols;
+				end;
+				FromRAMToVRAM(Line1, currentline);
+			end;
+		end;
 		currentline := currentline + 1;
+		emptylines[currentline] := false;
 	end;
-	emptylines[currentline] := false;
 
     close(textfile);
 
-    highestline := currentline - 1;		insertmode  := true;
+    highestline :=  currentline - 1;	insertmode  := true;
     currentline := 1;	column := 1;	screenline  := 1;
-
+    
     DrawScreen(currentline, screenline, 1);
+    
     ClearStatusLine;
     Blink(2, screenline + 1, maxwidth);
 end;

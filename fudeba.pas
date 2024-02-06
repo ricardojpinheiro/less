@@ -33,18 +33,18 @@ program fudeba;
 {$i d:blink.inc}
 
 BEGIN
-	EditWindowPtr := MakeWindow(0, 1, 80, 24, 'Teste');
-	GotoWindowXY(EditWindowPtr, 1, 1);
-	WriteLnWindow(EditWindowPtr, 'Isto é um teste');
-	Line1 := 	'Lorem Ipsum is simply dummy text of the printing and typesetting industry. ' 
-		+ 		'Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, '
-		+		'when an unknown printer took a galley of type and scrambled it to make a type specimen book.';
-	WriteLnWindow(EditWindowPtr, Line1);
-	read(kbd, c);
-	ScrollWindowUp(EditWindowPtr); 
-	read(kbd, c);
-	ScrollWindowDown(EditWindowPtr);
-	read(kbd, c);
-	EraseWindow(EditWindowPtr);
+    EditWindowPtr := MakeWindow(0, 1, 80, 24, 'Teste');
+    GotoWindowXY(EditWindowPtr, 1, 1);
+    WriteLnWindow(EditWindowPtr, 'Isto é um teste');
+    Line1 :=    'Lorem Ipsum is simply dummy text of the printing and typesetting industry. ' 
+        +       'Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, '
+        +       'when an unknown printer took a galley of type and scrambled it to make a type specimen book.';
+    WriteLnWindow(EditWindowPtr, Line1);
+    read(kbd, c);
+    ScrollWindowUp(EditWindowPtr); 
+    read(kbd, c);
+    ScrollWindowDown(EditWindowPtr);
+    read(kbd, c);
+    EraseWindow(EditWindowPtr);
 END.
 

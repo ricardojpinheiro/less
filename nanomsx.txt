@@ -13,9 +13,6 @@
  - arquivo - se nao tiver nome do arquivo, crie um arquivo novo.
  x na saida, limpar todos os blinks.
  
- 
- 
- 
  - colocar um easter egg - passa um parametro e vem aquele GNU nano em ASCII art.
 
 

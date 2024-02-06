@@ -38,39 +38,39 @@ end;
 
 Function ReadString (MaxLen: Byte): TString;
 Begin
-	FillChar(temp, Sizeof(temp), Chr(32));
-	i := 0;
-	Repeat
-		c := readkey;
-		Case c Of
-			#30..#126,#128..#255:	Begin
-										If i < Maxlen Then
-										Begin
-											i := i + 1;
-											Write(c);
-											temp[i] := c;
-										End
-										Else
-											Write(#7);
-									End;
-			#8: 					Begin
-										If i > 0 Then
-										Begin
-											i := i - 1;
-											Write(c);
-											Write(' ');
-											Write(c);
-											temp[0] := Chr(i);
-										End
-										Else
-											Write(#7);
-									End;
-		End; {Case}
+    FillChar(temp, Sizeof(temp), Chr(32));
+    i := 0;
+    Repeat
+        c := readkey;
+        Case c Of
+            #30..#126,#128..#255:   Begin
+                                        If i < Maxlen Then
+                                        Begin
+                                            i := i + 1;
+                                            Write(c);
+                                            temp[i] := c;
+                                        End
+                                        Else
+                                            Write(#7);
+                                    End;
+            #8:                     Begin
+                                        If i > 0 Then
+                                        Begin
+                                            i := i - 1;
+                                            Write(c);
+                                            Write(' ');
+                                            Write(c);
+                                            temp[0] := Chr(i);
+                                        End
+                                        Else
+                                            Write(#7);
+                                    End;
+        End; {Case}
 
-	Until c = #13;
+    Until c = #13;
 
-	i := RDifferentPos(chr(32), temp); 
-	delete(temp, i + 1, (MaxLen - (i + 1)));
+    i := RDifferentPos(chr(32), temp); 
+    delete(temp, i + 1, (MaxLen - (i + 1)));
     ReadString := temp;
 End; {ReadString}
 

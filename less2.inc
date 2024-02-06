@@ -21,7 +21,7 @@ begin
 
     case KindOf of
         1: begin (* Version *)
-                FastWriteln('Version 0.1 - Copyright (c) 2022 Brazilian MSX Crew.');
+                FastWriteln('Version 0.2 - Copyright (c) 2022-2024 Brazilian MSX Crew.');
                 FastWriteln('Some rights reserved (not many!).');
                 writeln;
                 FastWriteln('This text pager resembles the GNU less text pager,');
@@ -53,9 +53,9 @@ end;
 
 procedure quick_display(x, y: integer; s: TString);
 begin
-    GotoWindowXY(EditWindowPtr, x, y);
-    WriteWindow (EditWindowPtr, s);
-    ClrEolWindow(EditWindowPtr);
+    GotoWindowXY  (EditWindowPtr, x, y);
+    WriteWindow   (EditWindowPtr, s);
+    ClrEolWindow  (EditWindowPtr);
 end;
 
 (* Clears the status line. *)

@@ -58,14 +58,17 @@ Const
     SPACE       			= 32;
     DELETE      			= 127;
 
-	(*	Used in less - limits. *)
+	(*	Used in less - limits. 					*)
+	(* maxlines = 1568 and maxcols = 80 		*)
 
-    maxlines				= 1568;
+    maxlines				= 490;
     maxcols     			= 255;
     maxwidth    			= 78;
-    maxlength  				= 22;
+    maxlength  				= 23;
 
-	(*	Used in less - VRAM limits. *)
+	(*	Used in less - VRAM limits. 			*)
+    (* Don't change to hexadecimal. 			*)
+    (* startvram = $1400 and limitvram = $ff00. *)
 
     startvram       		= 5120;
     limitvram       		= 65280;
