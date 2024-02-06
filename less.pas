@@ -38,9 +38,11 @@ procedure ReadFile;
 var
     VRAMAddress, l:        		integer;
 	lengthline, lineparts:		byte;
-	
+
 begin
 	counter := startvram;
+
+	fillvram(0, startvram, 0, $FFFF);
 
 	temp	:= concat ('Reading file ', filename);
 	StatusLine(temp);
@@ -57,44 +59,51 @@ begin
 		readln(textfile, line);
 		lengthline := length(line);
 
-		InitVRAM(currentline, counter);
-		counter := counter + maxwidth;
-
 		if currentline = 783 then
 			fillvram(1, 0, 0, $FFFF);
 
-		if lengthline <= maxwidth then
-			FromRAMToVRAM(line, currentline)
-		else
+(*	If length of the read line is greater than the maxwidth,
+	you must break it into several lines, and save them into
+	VRAM, as individual lines. *)		
+
+		if lengthline > maxwidth then
 		begin
 			l := 1;
-			lineparts := lengthline div maxwidth;
-			for i := 1 to lineparts + 1 do
+			lineparts := (lengthline div maxwidth) + 1;
+			for i := 1 to lineparts do
 			begin
 				FillChar(Line1, sizeof(Line1), chr(32));
 				Line1 := copy (line, l, l + (maxwidth - 1));
-				l := l + maxwidth;
-				currentline := currentline + 1;
+				l := l + (maxwidth - 1);
+				
+				InitVRAM(currentline, counter);
+				counter := counter + maxwidth;
 
-				if i >= 1 then
-				begin
-					InitVRAM(currentline, counter);
-					counter := counter + maxcols;
-				end;
 				FromRAMToVRAM(Line1, currentline);
+				currentline := currentline + 1;
 			end;
+		end
+
+(*	If length of the read line is less than the maxwidth,
+	save it to VRAM. *)
+
+		else
+		begin
+			InitVRAM(currentline, counter);
+			counter := counter + maxwidth;
+
+			FromRAMToVRAM(line, currentline);
+			currentline := currentline + 1;
 		end;
-		currentline := currentline + 1;
-		emptylines[currentline] := false;
 	end;
 
     close(textfile);
 
     highestline :=  currentline - 1;	insertmode  := true;
     currentline := 1;	column := 1;	screenline  := 1;
-    
+   
     DrawScreen(currentline, screenline, 1);
-    
+
     ClearStatusLine;
     Blink(2, screenline + 1, maxwidth);
 end;

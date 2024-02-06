@@ -192,7 +192,6 @@ begin
             counter         := 0;
         end;
     end;
-    emptylines[linenumber] := true;
 end;
 
 

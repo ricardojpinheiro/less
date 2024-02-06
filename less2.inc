@@ -21,7 +21,7 @@ begin
 
     case KindOf of
         1: begin (* Version *)
-                FastWriteln('Version 0.2 - Copyright (c) 2022-2024 Brazilian MSX Crew.');
+                FastWriteln('Version 0.3 - Copyright (c) 2022-2024 Brazilian MSX Crew.');
                 FastWriteln('Some rights reserved (not many!).');
                 writeln;
                 FastWriteln('This text pager resembles the GNU less text pager,');
@@ -40,7 +40,7 @@ begin
                 FastWriteln('File: Text file which you want to be read.');
                 writeln;
                 FastWriteln('Parameters: ');
-				FastWriteln('/d<fg>,<bg>    - Define foreground and background colors.');
+                FastWriteln('/d<fg>,<bg>    - Define foreground and background colors.');
                 FastWriteln('/n             - Use line numbers.');
                 FastWriteln('/h             - Show this help text and exit.');
                 FastWriteln('/v             - Output version information and exit.');
@@ -75,7 +75,7 @@ begin
 
     message         := concat('[ ', message, ' ]');
     lengthmessage   := length(message);
-    ranking        	:= (maxwidth - lengthmessage) div 2;
+    ranking         := (maxwidth - lengthmessage) div 2;
 
     GotoXY(ranking, maxlength + 1);
     FastWrite(message);
@@ -85,7 +85,7 @@ end;
 procedure DrawScreen (currentline, screenline: integer; j: byte);
 begin
     if highestline <= (maxlength - j) then
-		aux := highestline
+        aux := highestline
     else
         aux := maxlength - j;
 
@@ -105,7 +105,7 @@ begin
     screenline  := 1;
     column      := 1;
     
-	ClearAllBlinks;
+    ClearAllBlinks;
     Blink(2, screenline, maxwidth);
     DrawScreen(currentline, screenline, 1);
 end;
@@ -135,15 +135,15 @@ begin
     begin
         GotoWindowXY(EditWindowPtr, 1, 1);
         ScrollWindowDown(EditWindowPtr);
-		
+        
         FillChar(line, sizeof(line), chr(32));
         FromVRAMToRAM(line, currentline);
         quick_display(1, 1, line);
     end
     else
     begin
-		screenline := screenline - 1;
-		ClearAllBlinks;
+        screenline := screenline - 1;
+        ClearAllBlinks;
         Blink(2, screenline, maxwidth);
     end;
 end;
@@ -155,8 +155,8 @@ begin
 
     currentline :=  currentline + 1;
     screenline  :=  screenline  + 1;
-	ClearAllBlinks;
-	Blink(2, screenline, maxwidth);
+    ClearAllBlinks;
+    Blink(2, screenline, maxwidth);
 
     if screenline > (maxlength - 1) then
     begin
@@ -194,31 +194,31 @@ procedure WhereIs (direction: Directions; nextoccurrence: boolean);
 begin
     if NOT nextoccurrence then
     begin
-		FillChar(searchstring, SizeOf(searchstring), Chr(32));
+        FillChar(searchstring, SizeOf(searchstring), Chr(32));
         GotoXY(1, maxlength + 1);
         ClrEol;
         Blink(1, maxlength + 1, maxwidth + 2);
-		temp := 'Search: ';
+        temp := 'Search: ';
         
         FastWrite (temp);
         searchstring := readstring(40);
     end;
-	
-	ClearStatusLine;
+    
+    ClearStatusLine;
 
     if length (searchstring) = 0 then
-	begin
-		BeginFile;
-		exit;
-	end;
+    begin
+        BeginFile;
+        exit;
+    end;
     
     i := currentline;
     
     if nextoccurrence = true then
-		if direction = forwardsearch then
-			i := i + 1
-		else
-			i := i - 1;
+        if direction = forwardsearch then
+            i := i + 1
+        else
+            i := i - 1;
         
     if direction = forwardsearch then
         stopsearch := highestline + 1
@@ -261,7 +261,7 @@ end;
 
 procedure Help;
 begin
-	ClearAllBlinks;
+    ClearAllBlinks;
     ClrWindow(EditWindowPtr);
     WritelnWindow(EditWindowPtr, 'Commands:');
     WritelnWindow(EditWindowPtr, 'e, j, Ctrl-E, Ctrl-J, ENTER, Down   - Forward  one line (or N lines).');
@@ -282,12 +282,12 @@ begin
     WritelnWindow(EditWindowPtr, 'q                                   - Exit.');
     c := readkey;
     DrawScreen(currentline, screenline, 1);
-	Blink(2, screenline, maxwidth);
+    Blink(2, screenline, maxwidth);
 end;
 
 procedure Version;
 begin
-	ClearAllBlinks;
+    ClearAllBlinks;
     ClrWindow(EditWindowPtr);
     WritelnWindow(EditWindowPtr, 'Version 0.1 - Copyright (c) 2022 Brazilian MSX Crew.:');
     WritelnWindow(EditWindowPtr, 'Some rights reserved (not many!).');
@@ -311,5 +311,5 @@ begin
     WritelnWindow(EditWindowPtr, '/v             - Output version information and exit.');
     c := readkey;
     DrawScreen(currentline, screenline, 1);
-	Blink(2, screenline, maxwidth);
+    Blink(2, screenline, maxwidth);
 end;

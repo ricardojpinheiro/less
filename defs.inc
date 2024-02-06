@@ -157,7 +157,6 @@ Var
 	(*	These variables are used by less itself. *)
 
     textlines:          				array [1..maxlines] of TVRAMText;
-    emptylines:         				array [1..maxlines] of boolean;
     temp:               				TString;
     NoPrint, Print, AllChars:           ASCII;
     
